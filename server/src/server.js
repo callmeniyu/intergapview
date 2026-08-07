@@ -1,10 +1,22 @@
+import "dotenv/config";
 import app from "./app.js";
+import connectToDB from "./config/db.js";
+import { setServers } from "node:dns/promises";
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3000";
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
+const BACKEND_URL = process.env.BACKEND_URL;
+const NODE_ENV = process.env.NODE_ENV;
 
-//run server here
+if (NODE_ENV == "development") {
+  var url = `${BACKEND_URL}:${PORT}`;
+  setServers(["1.1.1.1", "8.8.8.8"]);
+} else if (NODE_ENV == "production") {
+  url = BACKEND_URL;
+}
+
+//Connect to DB, File config/db.js
+connectToDB();
 
 app.listen(PORT, () => {
-  console.log(`Server is running on ${BACKEND_URL}${PORT}.`);
+  console.log(`Server running on port ${url}`);
 });

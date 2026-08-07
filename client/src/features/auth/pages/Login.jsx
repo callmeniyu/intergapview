@@ -1,0 +1,40 @@
+import { useState } from "react";
+import AuthLayout from "../components/AuthLayout";
+import FormField from "../components/FormField";
+import SocialButtons from "../components/SocialButtons";
+
+const Login = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  };
+
+  return (
+    <AuthLayout title="Welcome back" subtitle="Sign in to continue to your account" footerText="Don't have an account?" footerLinkText="Create one" footerLinkTo="/register">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <FormField id="email" label="Email address" type="email" name="email" icon="email" placeholder="you@example.com" value={formData.email} onChange={handleChange} autoComplete="email" required />
+        <FormField id="password" label="Password" type="password" name="password" icon="lock" placeholder="••••••••" value={formData.password} onChange={handleChange} autoComplete="current-password" required />
+
+        <button type="submit" className="btn-primary group">
+          Sign in
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true">
+            <path d="M5 12h14" />
+            <path d="m13 6 6 6-6 6" />
+          </svg>
+        </button>
+
+        <SocialButtons />
+      </form>
+    </AuthLayout>
+  );
+};
+
+export default Login;

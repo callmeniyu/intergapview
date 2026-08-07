@@ -1,12 +1,20 @@
-import "dotenv/config";
 import express from "express";
+import authRouter from "./routes/auth.route.js";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 
 const app = express();
 
-app.use(express.json());
+console.log(process.env.ORIGIN);
 
-app.get("/", (req, res) => {
-  res.send("Hiii");
-});
+app.use(
+  cors({
+    origin: process.env.ORIGIN,
+    credentials: true,
+  }),
+);
+app.use(express.json());
+app.use(cookieParser());
+app.use("/api/auth", authRouter);
 
 export default app;
