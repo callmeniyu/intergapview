@@ -39,7 +39,7 @@ export const logoutUser = async () => {
   }
 };
 
-export const getUserDetails = async ({ email, password }) => {
+export const getUserDetails = async () => {
   try {
     const response = await api.get("/api/auth/get-me");
     return response.data;

@@ -2,8 +2,12 @@ import { useState } from "react";
 import AuthLayout from "../components/AuthLayout";
 import FormField from "../components/FormField";
 import SocialButtons from "../components/SocialButtons";
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router";
 
 const Login = () => {
+  const { handleLogin } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -13,8 +17,10 @@ const Login = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    await handleLogin(formData);
+    navigate("/");
   };
 
   return (

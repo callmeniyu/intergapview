@@ -19,7 +19,7 @@ const Register = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (loading)
@@ -29,7 +29,7 @@ const Register = () => {
         </main>
       );
 
-    handleRegister(formData);
+    await handleRegister(formData);
     navigate("/");
   };
 
