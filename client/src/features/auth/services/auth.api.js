@@ -5,45 +5,38 @@ const api = axios.create({
   withCredentials: true,
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const msg = error.response?.data?.message || error.message || "Request failed";
+    error.message = msg;
+    return Promise.reject(error);
+  },
+);
+
 export const registerUser = async ({ username, email, password }) => {
-  try {
-    const response = await api.post("/api/auth/register", {
-      username,
-      email,
-      password,
-    });
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+  const response = await api.post("/api/auth/register", {
+    username,
+    email,
+    password,
+  });
+  return response.data;
 };
 
 export const loginUser = async ({ email, password }) => {
-  try {
-    const response = await api.post("/api/auth/login", {
-      email,
-      password,
-    });
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+  const response = await api.post("/api/auth/login", {
+    email,
+    password,
+  });
+  return response.data;
 };
 
 export const logoutUser = async () => {
-  try {
-    const response = await api.get("/api/auth/logout");
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+  const response = await api.get("/api/auth/logout");
+  return response.data;
 };
 
 export const getUserDetails = async () => {
-  try {
-    const response = await api.get("/api/auth/get-me");
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+  const response = await api.get("/api/auth/get-me");
+  return response.data;
 };

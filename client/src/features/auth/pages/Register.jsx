@@ -5,10 +5,12 @@ import SocialButtons from "../components/SocialButtons";
 import { registerUser } from "../services/auth.api.js";
 import { useAuth } from "../hooks/useAuth.js";
 import { useNavigate } from "react-router";
+import { useToast } from "../../toast/toast.context.jsx";
 
 const Register = () => {
   const navigate = useNavigate();
   const { loading, handleRegister } = useAuth();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -29,8 +31,17 @@ const Register = () => {
         </main>
       );
 
-    await handleRegister(formData);
-    navigate("/");
+    try {
+      const result = await handleRegister(formData);
+      if (result.ok) {
+        showToast({ status: "success", message: result.message });
+        navigate("/");
+      } else {
+        showToast({ status: "failed", message: result.error });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

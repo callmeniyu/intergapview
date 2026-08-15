@@ -2,6 +2,7 @@ import "dotenv/config";
 import app from "./app.js";
 import connectToDB from "./config/db.js";
 import { setServers } from "node:dns/promises";
+import { generateInterviewReport } from "./services/ai.services.js";
 
 const PORT = process.env.PORT;
 const BACKEND_URL = process.env.BACKEND_URL;

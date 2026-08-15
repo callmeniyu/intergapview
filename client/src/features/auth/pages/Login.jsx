@@ -4,9 +4,11 @@ import FormField from "../components/FormField";
 import SocialButtons from "../components/SocialButtons";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router";
+import { useToast } from "../../toast/toast.context";
 
 const Login = () => {
   const { handleLogin } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -19,8 +21,14 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await handleLogin(formData);
-    navigate("/");
+    const result = await handleLogin(formData);
+
+    if (result.ok) {
+      showToast({ status: "success", message: result.message });
+      navigate("/");
+    } else {
+      showToast({ status: "failed", message: result.error });
+    }
   };
 
   return (

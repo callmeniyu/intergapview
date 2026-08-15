@@ -46,6 +46,14 @@ const registerUser = async (req, res) => {
       },
     });
 
+    console.log("Registered new user succesfully", {
+      user: {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+      },
+    });
+
     console.log("New user has successfully registered.");
   } catch (error) {
     console.log(error);
@@ -88,6 +96,14 @@ const loginUser = async (req, res) => {
         email: user.email,
       },
     });
+
+    console.log("Logged in user succesfully", {
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: error.message });
@@ -108,8 +124,10 @@ const logoutUser = async (req, res) => {
 
     res.clearCookie("token");
     res.status(200).json({ message: "User logged out successfully" });
+    console.log("User succesfully logged out");
   } catch (error) {
     return res.status(500).json({ message: error.message });
+    console.log(error);
   }
 };
 
@@ -128,8 +146,16 @@ const getUserDetails = async (req, res) => {
     }
 
     res.status(200).json({ message: "User details fetched", user });
+    console.log("Registered new user succesfully", {
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
+    console.log(error);
   }
 };
 
