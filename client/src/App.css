@@ -104,4 +104,31 @@
   .auth-link {
     @apply font-semibold text-accent-400 transition duration-200 hover:text-accent-300;
   }
+
+  /* Themed scrollbar (used by dashboard scroll areas) */
+  .scrollbar-theme {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 171, 74, 0.45) transparent;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border: 2px solid transparent;
+      border-radius: 9999px;
+      background: linear-gradient(180deg, rgba(255, 171, 74, 0.55), rgba(192, 88, 0, 0.55));
+      background-clip: content-box;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(255, 171, 74, 0.85), rgba(192, 88, 0, 0.85));
+      background-clip: content-box;
+    }
+  }
 }

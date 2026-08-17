@@ -1,0 +1,182 @@
+import Navbar from "../../../components/Navbar";
+import Footer from "../../../components/Footer";
+import { ArrowRight, Upload } from "lucide-react";
+import { useRef, useState } from "react";
+import { useToast } from "../../toast/toast.context";
+import { useNavigate } from "react-router";
+import useInterview from "../hooks/useInterview"; // Keep this import
+
+const STEPS = [
+  {
+    number: "01",
+    title: "Upload your resume",
+    description: "Share your resume as a PDF so the analysis starts from your real experience.",
+  },
+  {
+    number: "02",
+    title: "Add the job description",
+    description: "Paste the posting you are targeting — the closer the match, the sharper the prep.",
+  },
+  {
+    number: "03",
+    title: "Get your interview report",
+    description: "Receive targeted questions, skill gaps, and a day-by-day preparation plan.",
+  },
+];
+
+const Home = () => {
+  const resumeRef = useRef();
+  const [formData, setFormData] = useState({
+    resume: null,
+    selfDescription: "",
+    jobDescription: "",
+  });
+  const { showToast } = useToast();
+  const { loading, handleCreateInterviewReport } = useInterview();
+  const navigate = useNavigate();
+  const [resumeFileName, setResumeFileName] = useState("");
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData((prev) => ({ ...prev, resume: file }));
+    setResumeFileName(file ? file.name : "");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { ok, report, message } = await handleCreateInterviewReport(formData.resume, formData.selfDescription, formData.jobDescription);
+    if (ok) {
+      navigate(`/interview/report/${report._id}`);
+    } else {
+      showToast({ status: "error", message: response.message });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-900 via-brand-950 to-[#140b03]">
+        <h1 className="text-cream text-2xl font-bold">Loading...</h1>
+      </div>
+    );
+  }
+
+  return (
+    <main className="relative flex min-h-screen flex-col overflow-hidden bg-gradient-to-b from-brand-900 via-brand-950 to-[#140b03]">
+      {/* ── Ambient background ─────────────────────── */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(200,88,0,0.22),transparent_70%)]" />
+        <div className="absolute -left-40 -top-40 h-[28rem] w-[28rem] animate-float rounded-full bg-brand-800/40 blur-3xl motion-reduce:animate-none" />
+        <div className="absolute -bottom-48 -right-40 h-[30rem] w-[30rem] animate-float rounded-full bg-accent-600/25 blur-3xl motion-reduce:animate-none" style={{ animationDelay: "-7s" }} />
+        <div className="absolute left-1/2 top-1/2 h-72 w-72 animate-float rounded-full bg-[#ffab4a]/10 blur-3xl motion-reduce:animate-none" style={{ animationDelay: "-3s" }} />
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage: "linear-gradient(rgba(253,251,212,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(253,251,212,0.5) 1px, transparent 1px)",
+            backgroundSize: "54px 54px",
+          }}
+        />
+      </div>
+
+      <Navbar />
+
+      <div className="relative mx-auto w-full max-w-6xl flex-1 px-4 pb-10 pt-4 sm:px-6 sm:pb-14 sm:pt-6 lg:px-8">
+        {/* Body */}
+        <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
+          {/* ── Hero / info column ──────────────────── */}
+          <section className="animate-fade-up motion-reduce:animate-none">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-accent-300">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
+              AI-Powered Interview Prep
+            </span>
+
+            <h1 className="mt-5 text-3xl font-bold leading-tight tracking-tight text-cream sm:text-4xl xl:text-[2.6rem] xl:leading-[1.15]">
+              Turn your resume into a <span className="bg-gradient-to-r from-accent-400 via-accent-500 to-brand-400 bg-clip-text text-transparent">winning interview plan</span>
+            </h1>
+
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-stone-400 sm:text-base">Upload your resume, paste the job description, and let our AI craft targeted questions, skill-gap analysis, and a day-by-day prep plan — all tailored to you.</p>
+
+            <ol className="mt-10 space-y-6">
+              {STEPS.map((step) => (
+                <li key={step.number} className="flex items-start gap-4">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-xs font-bold text-accent-400">{step.number}</span>
+                  <div>
+                    <p className="text-sm font-semibold text-cream sm:text-base">{step.title}</p>
+                    <p className="mt-1 max-w-sm text-sm leading-relaxed text-stone-500">{step.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          {/* ── Form card ───────────────────────────── */}
+          <section className="animate-fade-up rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-2xl shadow-black/60 backdrop-blur-xl motion-reduce:animate-none sm:p-8" style={{ animationDelay: "120ms" }}>
+            <div className="mb-6">
+              <h2 className="text-lg font-bold tracking-tight text-cream sm:text-xl">Create your report</h2>
+              <p className="mt-1 text-sm text-stone-400">Fill in the details below and get your personalized prep plan.</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Job description */}
+              <div>
+                <label htmlFor="jobDescription" className="auth-label">
+                  Job description
+                </label>
+                <textarea
+                  name="jobDescription"
+                  id="jobDescription"
+                  onChange={(e) => setFormData((prev) => ({ ...prev, jobDescription: e.target.value }))}
+                  rows={7}
+                  placeholder="Paste the full job posting here…"
+                  className="min-h-36 w-full resize-y rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-relaxed text-cream shadow-inner shadow-black/30 outline-none transition duration-200 placeholder:text-stone-500 focus:border-accent-400/50 focus:bg-white/[0.06] focus:shadow-none focus:ring-4 focus:ring-accent-500/15"
+                />
+              </div>
+
+              {/* Resume upload */}
+              <div>
+                <label htmlFor="resume" className="auth-label">
+                  Resume (PDF)
+                </label>
+                <label htmlFor="resume" className="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-white/15 bg-white/[0.02] px-4 py-8 text-center transition duration-200 hover:border-accent-400/60 hover:bg-white/[0.05] sm:py-10">
+                  {" "}
+                  {/* Added resumeFileName display */}
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-800/60 ring-1 ring-white/10 transition duration-200 group-hover:bg-accent-500/20 group-hover:ring-accent-400/40">
+                    <Upload className="h-6 w-6 text-accent-400" strokeWidth={1.8} aria-hidden="true" />
+                  </span>
+                  <span className="text-sm font-semibold text-cream">{resumeFileName || "Click to upload your resume"}</span>
+                  <span className="text-xs text-stone-500">{resumeFileName ? "PDF · " + resumeFileName : "PDF · Max 3 MB"}</span>
+                  <input type="file" ref={resumeRef} name="resume" id="resume" accept=".pdf" className="sr-only" onChange={handleFileChange} />
+                </label>
+              </div>
+
+              {/* Self description */}
+              <div>
+                <label htmlFor="selfDescription" className="auth-label">
+                  Self description
+                </label>
+                <textarea
+                  name="selfDescription"
+                  id="selfDescription"
+                  onChange={(e) => setFormData((prev) => ({ ...prev, selfDescription: e.target.value }))}
+                  rows={4}
+                  placeholder="Tell us briefly about your experience, strengths, and goals…"
+                  className="min-h-24 w-full resize-y rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-relaxed text-cream shadow-inner shadow-black/30 outline-none transition duration-200 placeholder:text-stone-500 focus:border-accent-400/50 focus:bg-white/[0.06] focus:shadow-none focus:ring-4 focus:ring-accent-500/15"
+                />
+              </div>
+
+              <button type="submit" className="btn-primary group">
+                Generate my report
+                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" strokeWidth={2.2} aria-hidden="true" />
+              </button>
+
+              <p className="text-center text-xs text-stone-500">Reports are AI-generated — review the output before your interview.</p>
+            </form>
+          </section>
+        </div>
+      </div>
+
+      <Footer />
+    </main>
+  );
+};
+
+export default Home;

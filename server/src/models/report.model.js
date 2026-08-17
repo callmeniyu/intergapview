@@ -26,7 +26,7 @@ const skillGapsSchema = new mongoose.Schema(
   { _id: false },
 );
 
-const preparationPlanSchema = new mongoose.Schema(
+const preparationPlansSchema = new mongoose.Schema(
   {
     day: { type: Number, required: [true, "Number of day is required for preparation plan"] },
     focus: { type: String, required: [true, "Number of day is required for preparation plan"] },
@@ -46,7 +46,7 @@ const reportSchema = new mongoose.Schema(
     technicalQuestions: [technicalQuestionsSchema],
     behavioralQuestions: [behavioralQuestionsSchema],
     skillGaps: [skillGapsSchema],
-    preparationPlans: [preparationPlanSchema],
+    preparationPlans: [preparationPlansSchema],
   },
   { timestamps: true },
 );

@@ -33,7 +33,7 @@ const reportSchema = z.object({
     }),
   ),
 
-  preparationPlan: z.array(
+  preparationPlans: z.array(
     z.object({
       day: z.number(),
       focus: z.string(),
@@ -112,7 +112,7 @@ const reportJsonSchema = {
       },
     },
 
-    preparationPlan: {
+    preparationPlans: {
       type: "array",
       items: {
         type: "object",
@@ -135,7 +135,7 @@ const reportJsonSchema = {
     },
   },
 
-  required: ["jobTitle", "matchScore", "technicalQuestions", "behavioralQuestions", "skillGaps", "preparationPlan"],
+  required: ["jobTitle", "matchScore", "technicalQuestions", "behavioralQuestions", "skillGaps", "preparationPlans"],
 };
 
 export const generateInterviewReport = async (resume, selfDescription, jobDescription) => {
@@ -168,7 +168,7 @@ Each item must contain:
 - skill
 - severity
 
-For preparationPlan:
+For preparationPlans:
 Each item must contain:
 - day
 - focus

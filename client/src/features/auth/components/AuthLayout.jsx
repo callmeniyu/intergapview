@@ -1,8 +1,10 @@
 import { Link } from "react-router";
+import Navbar from "../../../components/Navbar";
+import Footer from "../../../components/Footer";
 
 const AuthLayout = ({ title, subtitle, children, footerText, footerLinkText, footerLinkTo }) => {
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-brand-900 via-brand-950 to-[#140b03] px-4 py-12">
+    <main className="relative flex min-h-screen flex-col overflow-hidden bg-gradient-to-b from-brand-900 via-brand-950 to-[#140b03]">
       {/* ── Ambient background ─────────────────────── */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(200,88,0,0.22),transparent_70%)]" />
@@ -18,34 +20,33 @@ const AuthLayout = ({ title, subtitle, children, footerText, footerLinkText, foo
         />
       </div>
 
+      <Navbar />
+
       {/* ── Content ────────────────────────────────── */}
-      <div className="relative w-full max-w-md animate-fade-up motion-reduce:animate-none">
-        {/* Brand header */}
-        <div className="mb-8 gap-5 flex items-center text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-800 to-accent-500 shadow-lg shadow-brand-800/50 ring-1 ring-white/20">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-7 w-7 text-cream" aria-hidden="true">
-              <path d="M13 2 3.5 13.5h6L8.5 22 20 9.5h-6.5L13 2z" />
-            </svg>
-          </div>
-          <div className="flex flex-col items-start">
+      <div className="relative flex flex-1 items-center justify-center px-4 pb-12 pt-4 sm:pt-6">
+        <div className="w-full max-w-md animate-fade-up motion-reduce:animate-none">
+          {/* Title */}
+          <div className="mb-8 text-center">
             <h1 className="text-2xl font-bold tracking-tight text-cream">{title}</h1>
             <p className="mt-2 text-sm text-stone-400">{subtitle}</p>
           </div>
-        </div>
 
-        {/* Card */}
-        <div className="animate-fade-up rounded-2xl border border-white/10 bg-white/[0.03] p-6 shadow-2xl shadow-black/60 backdrop-blur-xl motion-reduce:animate-none sm:p-8" style={{ animationDelay: "120ms" }}>
-          {children}
-        </div>
+          {/* Card */}
+          <div className="animate-fade-up rounded-2xl border border-white/10 bg-white/[0.03] p-6 shadow-2xl shadow-black/60 backdrop-blur-xl motion-reduce:animate-none sm:p-8" style={{ animationDelay: "120ms" }}>
+            {children}
+          </div>
 
-        {/* Footer */}
-        <p className="animate-fade-up mt-6 text-center text-sm text-stone-400 motion-reduce:animate-none" style={{ animationDelay: "240ms" }}>
-          {footerText}{" "}
-          <Link to={footerLinkTo} className="auth-link">
-            {footerLinkText}
-          </Link>
-        </p>
+          {/* Footer link */}
+          <p className="animate-fade-up mt-6 text-center text-sm text-stone-400 motion-reduce:animate-none" style={{ animationDelay: "240ms" }}>
+            {footerText}{" "}
+            <Link to={footerLinkTo} className="auth-link">
+              {footerLinkText}
+            </Link>
+          </p>
+        </div>
       </div>
+
+      <Footer />
     </main>
   );
 };

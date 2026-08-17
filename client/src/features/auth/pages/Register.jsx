@@ -2,10 +2,10 @@ import { useState } from "react";
 import AuthLayout from "../components/AuthLayout";
 import FormField from "../components/FormField";
 import SocialButtons from "../components/SocialButtons";
-import { registerUser } from "../services/auth.api.js";
 import { useAuth } from "../hooks/useAuth.js";
 import { useNavigate } from "react-router";
 import { useToast } from "../../toast/toast.context.jsx";
+import { ArrowRight } from "lucide-react";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -53,10 +53,7 @@ const Register = () => {
 
         <button type="submit" className="btn-primary group">
           Create account
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true">
-            <path d="M5 12h14" />
-            <path d="m13 6 6 6-6 6" />
-          </svg>
+          <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" strokeWidth={2.2} aria-hidden="true" />
         </button>
 
         <SocialButtons />

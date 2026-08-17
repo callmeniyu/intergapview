@@ -5,6 +5,7 @@ import SocialButtons from "../components/SocialButtons";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router";
 import { useToast } from "../../toast/toast.context";
+import { ArrowRight } from "lucide-react";
 
 const Login = () => {
   const { handleLogin } = useAuth();
@@ -39,10 +40,7 @@ const Login = () => {
 
         <button type="submit" className="btn-primary group">
           Sign in
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true">
-            <path d="M5 12h14" />
-            <path d="m13 6 6 6-6 6" />
-          </svg>
+          <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" strokeWidth={2.2} aria-hidden="true" />
         </button>
 
         <SocialButtons />
