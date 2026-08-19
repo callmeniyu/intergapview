@@ -10,7 +10,9 @@ console.log(process.env.ORIGIN);
 
 app.use(
   cors({
-    origin: process.env.ORIGIN,
+    origin: process.env.CORS_ORIGIN || "https://intergapview-suw5.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }),
 );
