@@ -25,6 +25,7 @@ export const useAuth = () => {
       if (data) setUser(data?.user);
       return { ok: true, user: data?.user, message: data.message };
     } catch (error) {
+      console.log("error", error);
       return { ok: false, error: error.message };
     } finally {
       setLoading(false);

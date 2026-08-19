@@ -76,7 +76,7 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json("User not registered. Please signup first.");
+      return res.status(404).json({ message: "User not registered. Please signup first." });
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
