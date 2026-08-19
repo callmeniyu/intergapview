@@ -14,9 +14,9 @@ api.interceptors.response.use(
   },
 );
 
-export const createInterviewReport = async (resumeFile, selfDescription, jobDescription) => {
+export const createInterviewReport = async (resume, selfDescription, jobDescription) => {
   const formData = new FormData();
-  formData.append("resume", resumeFile);
+  formData.append("resume", resume);
   formData.append("selfDescription", selfDescription);
   formData.append("jobDescription", jobDescription);
 

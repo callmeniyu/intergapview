@@ -7,138 +7,77 @@ const ai = new GoogleGenAI({
 
 const reportSchema = z.object({
   jobTitle: z.string(),
-
   matchScore: z.number().min(0).max(100),
-
-  technicalQuestions: z.array(
-    z.object({
-      question: z.string(),
-      intention: z.string(),
-      answer: z.string(),
-    }),
-  ),
-
-  behavioralQuestions: z.array(
-    z.object({
-      question: z.string(),
-      intention: z.string(),
-      answer: z.string(),
-    }),
-  ),
-
-  skillGaps: z.array(
-    z.object({
-      skill: z.string(),
-      severity: z.enum(["low", "medium", "high"]),
-    }),
-  ),
-
-  preparationPlans: z.array(
-    z.object({
-      day: z.number(),
-      focus: z.string(),
-      tasks: z.array(z.string()),
-    }),
-  ),
+  technicalQuestions: z.array(z.object({ question: z.string(), intention: z.string(), answer: z.string() })),
+  behavioralQuestions: z.array(z.object({ question: z.string(), intention: z.string(), answer: z.string() })),
+  skillGaps: z.array(z.object({ skill: z.string(), severity: z.enum(["low", "medium", "high"]) })),
+  preparationPlans: z.array(z.object({ day: z.number(), focus: z.string(), tasks: z.array(z.string()) })),
 });
 
 const reportJsonSchema = {
   type: "object",
   properties: {
-    jobTitle: {
-      type: "string",
-      description: "The title of the job",
-    },
-
-    matchScore: {
-      type: "number",
-      minimum: 0,
-      maximum: 100,
-      description: "Candidate match score from 0 to 100",
-    },
-
+    jobTitle: { type: "string" },
+    matchScore: { type: "number", minimum: 0, maximum: 100 },
     technicalQuestions: {
       type: "array",
       items: {
         type: "object",
         properties: {
-          question: {
-            type: "string",
-          },
-          intention: {
-            type: "string",
-          },
-          answer: {
-            type: "string",
-          },
+          question: { type: "string" },
+          intention: { type: "string" },
+          answer: { type: "string" },
         },
         required: ["question", "intention", "answer"],
       },
     },
-
     behavioralQuestions: {
       type: "array",
       items: {
         type: "object",
         properties: {
-          question: {
-            type: "string",
-          },
-          intention: {
-            type: "string",
-          },
-          answer: {
-            type: "string",
-          },
+          question: { type: "string" },
+          intention: { type: "string" },
+          answer: { type: "string" },
         },
         required: ["question", "intention", "answer"],
       },
     },
-
     skillGaps: {
       type: "array",
       items: {
         type: "object",
         properties: {
-          skill: {
-            type: "string",
-          },
-          severity: {
-            type: "string",
-            enum: ["low", "medium", "high"],
-          },
+          skill: { type: "string" },
+          severity: { type: "string", enum: ["low", "medium", "high"] },
         },
         required: ["skill", "severity"],
       },
     },
-
     preparationPlans: {
       type: "array",
       items: {
         type: "object",
         properties: {
-          day: {
-            type: "integer",
-          },
-          focus: {
-            type: "string",
-          },
+          day: { type: "integer" },
+          focus: { type: "string" },
           tasks: {
             type: "array",
-            items: {
-              type: "string",
-            },
+            items: { type: "string" },
           },
         },
         required: ["day", "focus", "tasks"],
       },
     },
   },
-
   required: ["jobTitle", "matchScore", "technicalQuestions", "behavioralQuestions", "skillGaps", "preparationPlans"],
 };
 
-export const generateInterviewReport = async (resume, selfDescription, jobDescription) => {
+export const generateInterviewReport = async ({ resumeText, selfDescription, jobDescription }) => {
+  if (!resumeText || !selfDescription || !jobDescription) {
+    throw new Error("Missing required parameters");
+  }
+
   const prompt = `
 You are an expert technical recruiter and interview preparation coach.
 
@@ -182,7 +121,7 @@ Do not add fields such as:
 Do not invent candidate experience.
 
 CANDIDATE RESUME:
-${resume}
+${resumeText}
 
 CANDIDATE SELF DESCRIPTION:
 ${selfDescription}
@@ -218,7 +157,6 @@ ${jobDescription}
     }
 
     console.error("Gemini API error:", error);
-
     throw error;
   }
 };

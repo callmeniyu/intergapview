@@ -1,10 +1,12 @@
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { ArrowRight, Upload } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useToast } from "../../toast/toast.context";
 import { useNavigate } from "react-router";
-import useInterview from "../hooks/useInterview"; // Keep this import
+import useInterview from "../hooks/useInterview";
+import { z } from "zod";
+import Loader from "../../../components/Loader";
 
 const STEPS = [
   {
@@ -15,7 +17,7 @@ const STEPS = [
   {
     number: "02",
     title: "Add the job description",
-    description: "Paste the posting you are targeting — the closer the match, the sharper the prep.",
+    description: "Paste the posting you are targeting - the closer the match, the sharper the prep.",
   },
   {
     number: "03",
@@ -35,28 +37,58 @@ const Home = () => {
   const { loading, handleCreateInterviewReport } = useInterview();
   const navigate = useNavigate();
   const [resumeFileName, setResumeFileName] = useState("");
+  const [errors, setErrors] = useState([]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setFormData((prev) => ({ ...prev, resume: file }));
     setResumeFileName(file ? file.name : "");
+    // Clear resume error if it exists
+    setErrors((prevErrors) => prevErrors.filter((error) => error.path[0] !== "resume"));
+  };
+
+  const formSchema = z.object({
+    resume: z
+      .any()
+      .refine((file) => file instanceof File, "Resume is required.")
+      .refine((file) => file?.type === "application/pdf", "Only PDF files are allowed.")
+      .refine((file) => file?.size <= 3 * 1024 * 1024, "Resume must be less than 3MB."), // 3MB limit
+    jobDescription: z.string().min(1, "Job description is required"),
+    selfDescription: z.string().min(1, "Self description is required"),
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prevErrors) => prevErrors.filter((error) => error.path[0] !== name));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { ok, report, message } = await handleCreateInterviewReport(formData.resume, formData.selfDescription, formData.jobDescription);
+
+    const validationResult = formSchema.safeParse(formData);
+    if (!validationResult.success) {
+      setErrors(validationResult.error.issues);
+      showToast({ status: "failed", message: validationResult.error.issues[0].message }); // Show the first error in a toast
+      return;
+    }
+
+    // Clear any previous errors if validation passes
+    setErrors([]);
+
+    const { ok, report, message } = await handleCreateInterviewReport(formData.resume, formData.selfDescription, formData.jobDescription); // Fixed 'response' typo
     if (ok) {
       navigate(`/interview/report/${report._id}`);
     } else {
-      showToast({ status: "error", message: response.message });
+      showToast({ status: "error", message: message });
     }
   };
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-900 via-brand-950 to-[#140b03]">
-        <h1 className="text-cream text-2xl font-bold">Loading...</h1>
-      </div>
+      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-brand-900 via-brand-950 to-[#140b03]">
+        <Loader message="Generating your report, please wait..." />
+      </main>
     );
   }
 
@@ -84,17 +116,9 @@ const Home = () => {
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
           {/* ── Hero / info column ──────────────────── */}
           <section className="animate-fade-up motion-reduce:animate-none">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-accent-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
-              AI-Powered Interview Prep
-            </span>
-
             <h1 className="mt-5 text-3xl font-bold leading-tight tracking-tight text-cream sm:text-4xl xl:text-[2.6rem] xl:leading-[1.15]">
               Turn your resume into a <span className="bg-gradient-to-r from-accent-400 via-accent-500 to-brand-400 bg-clip-text text-transparent">winning interview plan</span>
             </h1>
-
-            <p className="mt-4 max-w-md text-sm leading-relaxed text-stone-400 sm:text-base">Upload your resume, paste the job description, and let our AI craft targeted questions, skill-gap analysis, and a day-by-day prep plan — all tailored to you.</p>
-
             <ol className="mt-10 space-y-6">
               {STEPS.map((step) => (
                 <li key={step.number} className="flex items-start gap-4">
@@ -112,7 +136,6 @@ const Home = () => {
           <section className="animate-fade-up rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-2xl shadow-black/60 backdrop-blur-xl motion-reduce:animate-none sm:p-8" style={{ animationDelay: "120ms" }}>
             <div className="mb-6">
               <h2 className="text-lg font-bold tracking-tight text-cream sm:text-xl">Create your report</h2>
-              <p className="mt-1 text-sm text-stone-400">Fill in the details below and get your personalized prep plan.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -124,11 +147,13 @@ const Home = () => {
                 <textarea
                   name="jobDescription"
                   id="jobDescription"
-                  onChange={(e) => setFormData((prev) => ({ ...prev, jobDescription: e.target.value }))}
+                  value={formData.jobDescription} // Controlled component
+                  onChange={handleChange}
                   rows={7}
                   placeholder="Paste the full job posting here…"
                   className="min-h-36 w-full resize-y rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-relaxed text-cream shadow-inner shadow-black/30 outline-none transition duration-200 placeholder:text-stone-500 focus:border-accent-400/50 focus:bg-white/[0.06] focus:shadow-none focus:ring-4 focus:ring-accent-500/15"
                 />
+                {errors.find((e) => e.path[0] === "jobDescription") && <p className="mt-2 text-xs text-red-400">{errors.find((e) => e.path[0] === "jobDescription")?.message}</p>}
               </div>
 
               {/* Resume upload */}
@@ -137,14 +162,13 @@ const Home = () => {
                   Resume (PDF)
                 </label>
                 <label htmlFor="resume" className="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-white/15 bg-white/[0.02] px-4 py-8 text-center transition duration-200 hover:border-accent-400/60 hover:bg-white/[0.05] sm:py-10">
-                  {" "}
-                  {/* Added resumeFileName display */}
                   <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-800/60 ring-1 ring-white/10 transition duration-200 group-hover:bg-accent-500/20 group-hover:ring-accent-400/40">
                     <Upload className="h-6 w-6 text-accent-400" strokeWidth={1.8} aria-hidden="true" />
                   </span>
-                  <span className="text-sm font-semibold text-cream">{resumeFileName || "Click to upload your resume"}</span>
-                  <span className="text-xs text-stone-500">{resumeFileName ? "PDF · " + resumeFileName : "PDF · Max 3 MB"}</span>
+                  <span className="text-sm font-semibold text-cream">{resumeFileName || "Click to upload your resume"}</span> {/* Display file name */}
+                  <span className="text-xs text-stone-500">{resumeFileName ? `PDF · ${resumeFileName}` : "PDF · Max 3 MB"}</span> {/* Display file name or max size */}
                   <input type="file" ref={resumeRef} name="resume" id="resume" accept=".pdf" className="sr-only" onChange={handleFileChange} />
+                  {errors.find((e) => e.path[0] === "resume") && <p className="mt-2 text-xs text-red-400">{errors.find((e) => e.path[0] === "resume")?.message}</p>}
                 </label>
               </div>
 
@@ -156,11 +180,13 @@ const Home = () => {
                 <textarea
                   name="selfDescription"
                   id="selfDescription"
-                  onChange={(e) => setFormData((prev) => ({ ...prev, selfDescription: e.target.value }))}
+                  value={formData.selfDescription} // Controlled component
+                  onChange={handleChange}
                   rows={4}
                   placeholder="Tell us briefly about your experience, strengths, and goals…"
                   className="min-h-24 w-full resize-y rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-relaxed text-cream shadow-inner shadow-black/30 outline-none transition duration-200 placeholder:text-stone-500 focus:border-accent-400/50 focus:bg-white/[0.06] focus:shadow-none focus:ring-4 focus:ring-accent-500/15"
                 />
+                {errors.find((e) => e.path[0] === "selfDescription") && <p className="mt-2 text-xs text-red-400">{errors.find((e) => e.path[0] === "selfDescription")?.message}</p>}
               </div>
 
               <button type="submit" className="btn-primary group">
@@ -168,7 +194,7 @@ const Home = () => {
                 <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" strokeWidth={2.2} aria-hidden="true" />
               </button>
 
-              <p className="text-center text-xs text-stone-500">Reports are AI-generated — review the output before your interview.</p>
+              <p className="text-center text-xs text-stone-500">Reports are AI-generated - review the output before your interview.</p>
             </form>
           </section>
         </div>

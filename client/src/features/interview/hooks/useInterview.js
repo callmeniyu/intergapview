@@ -11,10 +11,10 @@ const useInterview = () => {
 
   const { loading, setLoading, report, setReport, reports, setReports } = context;
 
-  const handleCreateInterviewReport = async (resumeFile, selfDescription, jobDescription) => {
+  const handleCreateInterviewReport = async (resume, selfDescription, jobDescription) => {
     setLoading(true);
     try {
-      const data = await createInterviewReport(resumeFile, selfDescription, jobDescription);
+      const data = await createInterviewReport(resume, selfDescription, jobDescription);
       if (data) setReport(data?.report);
       return { ok: true, report: data?.report, message: data.message };
     } catch (error) {

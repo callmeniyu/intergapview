@@ -14,7 +14,7 @@ export const createInterviewReport = async (req, res) => {
     const { selfDescription, jobDescription } = req.body;
 
     const generateReportByAi = await generateInterviewReport({
-      resume: resumeContent.text,
+      resumeText: resumeContent.text,
       selfDescription,
       jobDescription,
     });

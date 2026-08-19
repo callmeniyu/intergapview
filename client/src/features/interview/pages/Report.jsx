@@ -4,6 +4,7 @@ import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import useInterview from "../hooks/useInterview";
 import { useParams } from "react-router";
+import Loader from "../../../components/Loader";
 
 /* ── Static style maps / config ────────────────────────── */
 const SEVERITY_META = {
@@ -129,9 +130,9 @@ const Report = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-900 via-brand-950 to-[#140b03]">
-        <h1 className="text-cream text-2xl font-bold">Loading...</h1>
-      </div>
+      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-brand-900 via-brand-950 to-[#140b03]">
+        <Loader message="Fetching your report..." />
+      </main>
     );
   }
 
@@ -287,8 +288,6 @@ const Report = () => {
           </div>
         </aside>
       </div>
-
-      <Footer />
     </main>
   );
 };
