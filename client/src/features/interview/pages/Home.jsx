@@ -1,6 +1,6 @@
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
-import { ArrowRight, Upload } from "lucide-react";
+import { ArrowRight, FileText, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "../../toast/toast.context";
 import { useNavigate } from "react-router";
@@ -34,10 +34,14 @@ const Home = () => {
     jobDescription: "",
   });
   const { showToast } = useToast();
-  const { loading, handleCreateInterviewReport } = useInterview();
+  const { loading, reports, handleCreateInterviewReport, handleGetAllInterviewReports } = useInterview();
   const navigate = useNavigate();
   const [resumeFileName, setResumeFileName] = useState("");
   const [errors, setErrors] = useState([]);
+
+  useEffect(() => {
+    handleGetAllInterviewReports();
+  }, [handleGetAllInterviewReports]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -119,17 +123,45 @@ const Home = () => {
             <h1 className="mt-5 text-3xl font-bold leading-tight tracking-tight text-cream sm:text-4xl xl:text-[2.6rem] xl:leading-[1.15]">
               Turn your resume into a <span className="bg-gradient-to-r from-accent-400 via-accent-500 to-brand-400 bg-clip-text text-transparent">winning interview plan</span>
             </h1>
-            <ol className="mt-10 space-y-6">
-              {STEPS.map((step) => (
-                <li key={step.number} className="flex items-start gap-4">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-xs font-bold text-accent-400">{step.number}</span>
-                  <div>
-                    <p className="text-sm font-semibold text-cream sm:text-base">{step.title}</p>
-                    <p className="mt-1 max-w-sm text-sm leading-relaxed text-stone-500">{step.description}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            {!reports && (
+              <ol className="mt-10 space-y-6">
+                {STEPS.map((step) => (
+                  <li key={step.number} className="flex items-start gap-4">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-xs font-bold text-accent-400">{step.number}</span>
+                    <div>
+                      <p className="text-sm font-semibold text-cream sm:text-base">{step.title}</p>
+                      <p className="mt-1 max-w-sm text-sm leading-relaxed text-stone-500">{step.description}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            )}
+
+            {reports?.length > 0 && (
+              <section className="mt-10 border-t border-white/10 pt-6" aria-labelledby="previous-reports-heading">
+                <div className="mb-4 flex items-center justify-between gap-4">
+                  <h2 id="previous-reports-heading" className="text-base font-bold text-cream">
+                    Previous reports
+                  </h2>
+                  <span className="text-xs text-stone-500">{reports.length} total</span>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {reports.map((report) => (
+                    <button key={report._id} type="button" onClick={() => navigate(`/interview/report/${report._id}`)} className="group min-h-28 rounded-lg border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-accent-400/50 hover:bg-white/[0.06] focus:outline-none focus:ring-2 focus:ring-accent-400/60">
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-accent-500/10 text-accent-400">
+                          <FileText className="h-4 w-4" aria-hidden="true" />
+                        </span>
+                        <span className="text-xs font-semibold text-accent-400">{report.matchScore ?? 0}% match</span>
+                      </div>
+                      <p className="mt-3 truncate text-sm font-semibold text-cream group-hover:text-accent-300">{report.jobTitle || "Interview report"}</p>
+                      <p className="mt-1 text-xs text-stone-500">{report.createdAt ? new Date(report.createdAt).toLocaleDateString() : "Recently created"}</p>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
           </section>
 
           {/* ── Form card ───────────────────────────── */}

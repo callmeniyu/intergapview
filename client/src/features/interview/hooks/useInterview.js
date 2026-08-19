@@ -1,15 +1,11 @@
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 import { InterviewContext } from "../contexts/interview.context";
-import { createInterviewReport, getInterviewReport } from "../services/interview.api";
+import { createInterviewReport, getAllInterviewReports, getInterviewReport } from "../services/interview.api";
 
 const useInterview = () => {
   const context = useContext(InterviewContext);
 
-  if (!context) {
-    return console.log("InterviewCOntext must be used inside a InterviewProvider");
-  }
-
-  const { loading, setLoading, report, setReport, reports, setReports } = context;
+  const { loading, setLoading, report, setReport, reports, setReports } = context ?? {};
 
   const handleCreateInterviewReport = async (resume, selfDescription, jobDescription) => {
     setLoading(true);
@@ -38,7 +34,7 @@ const useInterview = () => {
     }
   };
 
-  const handleGetAllInterviewReports = async () => {
+  const handleGetAllInterviewReports = useCallback(async () => {
     try {
       const data = await getAllInterviewReports();
       if (data) setReports(data?.reports);
@@ -49,7 +45,12 @@ const useInterview = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [setLoading, setReports]);
+
+  if (!context) {
+    console.log("InterviewCOntext must be used inside a InterviewProvider");
+    return null;
+  }
 
   return { handleCreateInterviewReport, handleGetInterviewReport, handleGetAllInterviewReports, loading, report, reports };
 };
