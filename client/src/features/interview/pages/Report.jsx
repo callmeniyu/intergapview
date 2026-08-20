@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CalendarDays, Check, ChevronDown, Code, FileText, LayoutGrid, Lightbulb, MessageCircle, Target } from "lucide-react";
+import { CalendarDays, Check, ChevronDown, Code, Download, FileText, LayoutGrid, Lightbulb, MessageCircle, Target } from "lucide-react";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import useInterview from "../hooks/useInterview";
@@ -105,7 +105,7 @@ const ContextCard = ({ label, icon: Icon, content }) => (
 /* ── Page ──────────────────────────────────────────────── */
 const Report = () => {
   const [report, setReport] = useState(null);
-  const { loading, handleGetInterviewReport } = useInterview();
+  const { loading, handleGetInterviewReport, handleCreateResumePdf } = useInterview();
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -127,6 +127,19 @@ const Report = () => {
     };
     getReport();
   }, []);
+
+  const getResumePdf = async () => {
+    try {
+      const { ok, message } = await handleCreateResumePdf(report?.resumeText, report?.selfDescription, report?.jobDescription);
+      if (ok) {
+        window.open(pdfUrl, "_blank");
+      } else {
+        console.log(message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   if (loading) {
     return (
@@ -171,6 +184,11 @@ const Report = () => {
               );
             })}
           </nav>
+
+          <button onClick={getResumePdf} className="mt-4 flex w-full items-center justify-center gap-2 cursor-pointer rounded-lg bg-brand-700/60 px-4 py-2.5 text-sm font-semibold text-cream shadow-inner shadow-black/20 transition duration-200 hover:bg-brand-700/80">
+            <Download className="h-4 w-4" aria-hidden="true" />
+            Download Resume
+          </button>
         </aside>
 
         {/* Center — active section content (scrolls) */}

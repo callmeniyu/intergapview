@@ -41,7 +41,7 @@ const Home = () => {
 
   useEffect(() => {
     handleGetAllInterviewReports();
-  }, [handleGetAllInterviewReports]);
+  }, []);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];

@@ -37,3 +37,18 @@ export const getAllInterviewReports = async () => {
   const response = await api.get("/api/interview/reports");
   return response.data;
 };
+
+export const createResumePdf = async (resume, selfDescription, jobDescription) => {
+  const formData = new FormData();
+  formData.append("resume", resume);
+  formData.append("selfDescription", selfDescription);
+  formData.append("jobDescription", jobDescription);
+
+  const response = await api.post("/api/interview/report/pdf", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    responseType: "blob",
+  });
+  return response.data;
+};

@@ -1,0 +1,2 @@
+- loading log in server while ai generation
+- understand how multer and pdf file is handled

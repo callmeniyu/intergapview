@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
+import { log } from "node:console";
 import { z } from "zod";
-
+import zodToJsonSchema from "zod-to-json-schema";
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
@@ -131,6 +132,7 @@ ${jobDescription}
 `;
 
   try {
+    console.log("Generating interview report with Gemini API...");
     const interaction = await ai.interactions.create({
       model: "gemini-3.6-flash",
       input: prompt,
@@ -146,6 +148,86 @@ ${jobDescription}
 
     const report = reportSchema.parse(raw);
     return report;
+  } catch (error) {
+    if (error?.status === 429) {
+      throw new Error("Gemini API quota exceeded. Please check your Gemini API billing and quota.");
+    }
+
+    if (error instanceof z.ZodError) {
+      console.error("Gemini returned invalid structured data:");
+      console.error(error.issues);
+    }
+
+    console.error("Gemini API error:", error);
+    throw error;
+  }
+};
+
+export const generateResumePdfContent = async ({ resumeText, selfDescription, jobDescription }) => {
+  if (!resumeText || !selfDescription || !jobDescription) {
+    throw new Error("Missing required parameters");
+  }
+
+  const resumePdfZodSchema = z.object({
+    pdfContent: z.string().describe("Content provided by user resume"),
+  });
+
+  const resumePdfJsonSchema = {
+    type: "object",
+    properties: {
+      pdfContent: { type: "string", description: "Content provided by user resume" },
+    },
+    required: ["pdfContent"],
+  };
+
+  const prompt = `
+    You are an expert technical recruiter and interview preparation coach.
+
+    Analyze the candidate's resume, self-description, and target job description.
+
+    Generate a HTML resume content for the candidate.
+
+    IMPORTANT:
+    - The response MUST be a single JSON object with exactly one key: "pdfContent".
+    - The value of "pdfContent" must be a string containing the HTML content of the resume.
+    - The response must be derived from the user's resume.
+    - The response should be tailored for the job description provided.
+    - Create a professional and visually appealing HTML resume content.
+
+    Do not add any other keys, explanations, or text outside the JSON object.
+
+    CANDIDATE RESUME:
+    ${resumeText}
+
+    CANDIDATE SELF DESCRIPTION:
+    ${selfDescription}
+
+    JOB DESCRIPTION:
+    ${jobDescription}
+
+    Output JSON with this exact structure only:
+    {
+      "pdfContent": "<the HTML string>"
+    }
+    `;
+
+  try {
+    console.log("Generating resume PDF with Gemini API...");
+    const interaction = await ai.interactions.create({
+      model: "gemini-3.6-flash",
+      input: prompt,
+      response_format: {
+        type: "text",
+        mime_type: "application/json",
+        schema: resumePdfJsonSchema,
+      },
+    });
+
+    const raw = JSON.parse(interaction.output_text);
+    console.log("Ai ouput", raw);
+
+    const pdfContent = resumePdfZodSchema.parse(raw);
+    return pdfContent;
   } catch (error) {
     if (error?.status === 429) {
       throw new Error("Gemini API quota exceeded. Please check your Gemini API billing and quota.");
